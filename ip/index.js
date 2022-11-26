@@ -1,6 +1,7 @@
 //axios import buraya gelecek
+import axios from "axios";
 
-var benimIP;
+var benimIP = "95.70.132.107";
 
 
 // ------------ değiştirmeyin --------------
@@ -31,9 +32,40 @@ async function ipAdresimiAl(){
 	ADIM 5'e gelene kadar fonksiyonunuzu test etmek için ip nizi URL'ye manuel olarak ekleyebilirsiniz.
 */
 
+const getData = async function (){
+	await ipAdresimiAl(); //asenkron sonucu beklemek için await kullandık
+	axios.get(`https://apis.ergineer.com/ipgeoapi/${benimIP}`) //veri almak için get
+	.then(function(response){
+		return response.data;
+	})
+	.then(function(ipDatasi){
+		document.querySelector("div.cards").appendChild(cardOlustur(ipDatasi));
+	})
+};
+getData();
+
 /*
 	ADIM 2: Geri döndürülen verileri inceleyin, bu sizin ip bilgileriniz! Bileşen fonksiyonunuzu geliştirmek içindeki bu veri yapısını
 	iyice anlamanız gerekmektedir.
+	{
+    "sorgu": "95.70.132.107",
+    "durum": "OK",
+    "kıta": "Asia",
+    "ülke": "Turkey",
+    "ülkeKodu": "TR",
+    "ülkebayrağı": "https://apis.ergineer.com/ulkebayraklari/TR",
+    "bölge": "34",
+    "bölgeAdı": "Istanbul",
+    "şehir": "Istanbul",
+    "zip": "34010",
+    "enlem": 41.0247,
+    "boylam": 28.9252,
+    "saatdilimi": "Europe/Istanbul",
+    "parabirimi": "TRY",
+    "isp": "TurkNet Iletisim Hizmetleri",
+    "organizasyon": "TurkNet Iletisim Hizmetleri A.S.",
+    "as": "AS12735 TurkNet Iletisim Hizmetleri A.S."
+}
 	
 */
 /*
@@ -53,11 +85,49 @@ async function ipAdresimiAl(){
 	</div>
     </div>
 */
+function cardOlustur(veri){
+	const _div=document.createElement("div");
+	_div.classList.add("card");
+
+	const _img=document.createElement("img");
+	_img.src=veri["ülkebayrağı"];
+	_div.appendChild(_img);
+
+	const _infoDiv=document.createElement("div");
+	_infoDiv.classList.add("card-info");
+
+	const _h3=document.createElement("h3");
+	_h3.classList.add("ip");
+	_h3.textContent=veri["sorgu"];
+	_infoDiv.appendChild(_h3);
+
+	const p_ulke=document.createElement("p");
+	p_ulke.classList.add("ulke");
+	p_ulke.textContent=`${veri["ülke"]} (${veri["ülkeKodu"]})`;
+	_infoDiv.appendChild(p_ulke);
+
+	let dizi=[`Enlem: ${veri["enlem"]} Boylam: ${veri["boylam"]}`,
+	`Şehir: ${veri["şehir"]}`,
+	`Saat Dilimi: ${veri["saatdilimi"]}`,
+	`Para Birimi: ${veri["parabirimi"]}`,
+	`ISP: ${veri["isp"]}`];
+
+	dizi.forEach(p_dizi => {
+		let _p=document.createElement("p");
+		_p.textContent=p_dizi;
+		_infoDiv.appendChild(_p);
+	});
+	_div.appendChild(_infoDiv);
+
+
+	return _div;
+}
 
 /*
 	ADIM 4: API'den alınan verileri kullanarak ADIM 3'te verilen yapıda bir kart oluşturun ve 
 	bu kartı DOM olarak .cards elementinin içine ekleyin. 
 */
+
 
 /*
 	ADIM 5: Manuel olarak eklediğiniz IP adresini dinamiğe dönüştürün. 
